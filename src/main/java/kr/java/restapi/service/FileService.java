@@ -3,6 +3,8 @@ package kr.java.restapi.service;
 import jakarta.annotation.PostConstruct;
 import kr.java.restapi.model.dto.FileResponse;
 import kr.java.restapi.model.entity.FileEntity;
+import kr.java.restapi.model.exception.BadRequestException;
+import kr.java.restapi.model.exception.NotFoundException;
 import kr.java.restapi.model.repository.FileRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +22,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.UUID;
 
@@ -95,7 +96,9 @@ public class FileService {
     // DOWNLOAD: 파일 리소스 로드
     public Resource loadAsResource(Long fileId) {
         FileEntity fileEntity = fileRepository.findById(fileId)
-                .orElseThrow(() -> new NoSuchElementException("파일이 존재하지 않습니다: " + fileId));
+                // #(3)-6-1
+//                .orElseThrow(() -> new NoSuchElementException("파일이 존재하지 않습니다: " + fileId));
+                .orElseThrow(() -> new NotFoundException("파일이 존재하지 않습니다: " + fileId));
 
         try {
             Path filePath = Paths.get(fileEntity.getFilePath());
@@ -104,16 +107,22 @@ public class FileService {
             if (resource.exists() && resource.isReadable()) {
                 return resource;
             }
-            throw new NoSuchElementException("파일이 존재하지 않습니다: " + fileId);
+            // #(3)-6-2
+//            throw new NoSuchElementException("파일이 존재하지 않습니다: " + fileId);
+            throw new NotFoundException("파일이 존재하지 않습니다: " + fileId);
 
         } catch (MalformedURLException e) {
-            throw new IllegalArgumentException("파일 경로 오류: " + fileId);
+            // #(3)-6-3
+//            throw new IllegalArgumentException("파일 경로 오류: " + fileId);
+            throw new NotFoundException("파일 경로 오류: " + fileId);
         }
     }
 
     public FileEntity findById(Long id) {
         return fileRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("파일이 존재하지 않습니다: " + id));
+                // #(5)-9
+//                .orElseThrow(() -> new NoSuchElementException("파일이 존재하지 않습니다: " + id));
+                .orElseThrow(() -> new NotFoundException("파일이 존재하지 않습니다: " + id));
     }
 
     public List<FileResponse> findAll() {
@@ -125,11 +134,15 @@ public class FileService {
     // 파일 검증
     private void validateFile(MultipartFile file) {
         if (file.isEmpty()) {
-            throw new IllegalArgumentException("파일이 비어있습니다.");
+            // #(3)-6-4
+//            throw new IllegalArgumentException("파일이 비어있습니다.");
+            throw new BadRequestException("파일이 비어있습니다.");
         }
         String contentType = file.getContentType();
         if (contentType == null || !ALLOWED_TYPES.contains(contentType)) {
-            throw new IllegalArgumentException("허용되지 않는 파일 형식입니다.");
+            // #(3)-6-5
+//            throw new IllegalArgumentException("허용되지 않는 파일 형식입니다.");
+            throw new BadRequestException("허용되지 않는 파일 형식입니다.");
         }
     }
 

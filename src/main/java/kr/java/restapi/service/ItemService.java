@@ -4,13 +4,13 @@ import kr.java.restapi.model.dto.ItemCreateRequest;
 import kr.java.restapi.model.dto.ItemResponse;
 import kr.java.restapi.model.dto.ItemUpdateRequest;
 import kr.java.restapi.model.entity.Item;
+import kr.java.restapi.model.exception.NotFoundException;
 import kr.java.restapi.model.repository.ItemRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 /**
  * 상품 서비스
@@ -33,8 +33,11 @@ public class ItemService {
 
     // READ: 단건 조회
     public ItemResponse findById(Long id) {
+//        Item item = itemRepository.findById(id)
+//                .orElseThrow(() -> new NoSuchElementException("상품이 존재하지 않습니다. : " + id));
+        // #(3)-3
         Item item = itemRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("상품이 존재하지 않습니다. : " + id));
+                .orElseThrow(() -> NotFoundException.forItem(id));
         return ItemResponse.from(item);
     }
 
@@ -48,9 +51,9 @@ public class ItemService {
     // UPDATE: 상품 수정
     @Transactional
     public ItemResponse update(Long id, ItemUpdateRequest request) {
+        // #(3)-4
         Item item = itemRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("상품이 존재하지 않습니다. : " + id));
-
+                .orElseThrow(() -> NotFoundException.forItem(id));
         // 더티 체킹으로 자동 UPDATE
         item.update(request.name(), request.price(), request.description());
 
@@ -61,7 +64,8 @@ public class ItemService {
     @Transactional
     public void delete(Long id) {
         if (!itemRepository.existsById(id)) {
-            throw new NoSuchElementException("상품이 존재하지 않습니다. : " + id);
+            // #(3)-5
+            throw NotFoundException.forItem(id);
         }
         itemRepository.deleteById(id);
     }
