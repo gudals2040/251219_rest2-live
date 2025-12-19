@@ -1,6 +1,13 @@
 package kr.java.restapi.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import kr.java.restapi.model.dto.ErrorResponse;
 import kr.java.restapi.model.dto.ItemCreateRequest;
 import kr.java.restapi.model.dto.ItemResponse;
 import kr.java.restapi.model.dto.ItemUpdateRequest;
@@ -44,11 +51,35 @@ import java.util.List;
 //        allowedHeaders = "*",
 //        maxAge = 3600
 //)
+// #(3)-3-1
+@Tag(name = "Item", description = "상품 관리 API")
 public class ItemApiController {
 
     private final ItemService itemService;
 
     // CREATE: POST /api/items → 201 Created
+    // #(3)-3-2
+    @Operation(
+            summary = "상품 생성",
+            description = "새로운 상품을 등록합니다. 상품명과 가격은 필수입니다."
+    )
+    // #(3)-3-3
+    @ApiResponses({
+        @ApiResponse(
+            responseCode = "201",
+            description = "생성 성공",
+            content = @Content(
+                schema = @Schema(implementation = ItemResponse.class)
+            )
+        ),
+        @ApiResponse(
+                responseCode = "400",
+                description = "잘못된 요청 (유효성 검증 실패)",
+                content = @Content(
+                        schema = @Schema(implementation = ErrorResponse.class)
+                )
+        ),
+    })
     @PostMapping
     public ResponseEntity<ItemResponse> create(
             @Valid @RequestBody ItemCreateRequest request) {
