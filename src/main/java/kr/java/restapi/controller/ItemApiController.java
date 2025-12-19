@@ -1,6 +1,7 @@
 package kr.java.restapi.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -92,8 +93,16 @@ public class ItemApiController {
     }
 
     // READ: GET /api/items/{id} → 200 OK
+    // #(3)-3-4
+    @Operation(summary = "상품 단건 조회")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "404", description = "상품 없음")
+    })
     @GetMapping("/{id}")
-    public ResponseEntity<ItemResponse> findById(@PathVariable Long id) {
+    public ResponseEntity<ItemResponse> findById(
+        @Parameter(description = "상품 ID", example = "1", required = true)
+        @PathVariable Long id) {
         ItemResponse response = itemService.findById(id);
         return ResponseEntity.ok(response);
     }
