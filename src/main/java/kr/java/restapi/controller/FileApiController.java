@@ -1,5 +1,9 @@
 package kr.java.restapi.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.java.restapi.model.dto.FileResponse;
 import kr.java.restapi.model.entity.FileEntity;
 import kr.java.restapi.service.FileService;
@@ -23,16 +27,24 @@ import java.util.List;
  * - GET  /api/files              : 목록
  * - GET  /api/files/{id}/download : 다운로드
  */
+// #(3)-7
 @RestController
 @RequestMapping("/api/files")
 @RequiredArgsConstructor
+@Tag(name = "File", description = "파일 업로드/다운로드 API")
 public class FileApiController {
 
     private final FileService fileService;
 
     // UPLOAD: POST /api/files → 201 Created
-    @PostMapping
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE) // 필수적으로!
+    @Operation(summary = "파일 업로드", description = "파일을 서버에 업로드합니다.")
     public ResponseEntity<FileResponse> upload(
+            @Parameter(
+                    description = "업로드할 파일",
+//                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)
+                    content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE)
+            )
             @RequestParam("file") MultipartFile file) {
 
         FileResponse response = fileService.upload(file);
