@@ -6,6 +6,7 @@ import kr.java.restapi.model.dto.ItemResponse;
 import kr.java.restapi.model.dto.ItemUpdateRequest;
 import kr.java.restapi.service.ItemService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,7 +28,22 @@ import java.util.List;
 @RequestMapping("/api/items")
 @RequiredArgsConstructor
 // #(2)-2
-@CrossOrigin(origins = "*")
+//@CrossOrigin(origins = "*")
+// #(2)-3
+//@CrossOrigin(
+//        origins = {
+//        "http://127.0.0.1:5500",
+//        "http://localhost:5500"
+//        },
+//        methods = {
+//                RequestMethod.GET,
+//                RequestMethod.POST,
+//                RequestMethod.PUT,
+//                RequestMethod.DELETE,
+//        },
+//        allowedHeaders = "*",
+//        maxAge = 3600
+//)
 public class ItemApiController {
 
     private final ItemService itemService;
